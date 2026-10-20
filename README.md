@@ -4,6 +4,13 @@ A production-ready, algorithm-driven hostel room allocation and roommate groupin
 
 ---
 
+### 🌐 Live Interactive Demo
+🚀 **Access the Live Web Application:** **[StayWise — Smart Hostel Room Booking & Allocation System](https://smart-priority-based-hostel-room-al.vercel.app/)**
+
+> *Note: The full-stack interactive client is deployed on Vercel and connected to our cloud backend to visualize the 4 core DSA allocation algorithms in real time.*
+
+---
+
 ## 🎯 System Architecture & DSA Modules
 
 The backend architecture is modularly divided across 4 core Data Structures and Algorithm paradigms:
