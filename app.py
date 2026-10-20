@@ -4,10 +4,16 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from config import Config
 from models import db
-from routes.auth_routes import auth_bp
-from routes.student_routes import student_bp
-from routes.admin_routes import admin_bp
-from routes.payment_routes import payment_bp
+try:
+    from routes.auth_routes import auth_bp
+    from routes.student_routes import student_bp
+    from routes.admin_routes import admin_bp
+    from routes.payment_routes import payment_bp
+except ModuleNotFoundError:
+    from auth_routes import auth_bp
+    from student_routes import student_bp
+    from admin_routes import admin_bp
+    from payment_routes import payment_bp
 
 # Locate frontend dist folder (supports both local and Docker container layouts)
 frontend_dist = os.environ.get(
