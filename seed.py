@@ -496,6 +496,88 @@ def seed_database():
         },
     ]
 
+    # --- Additional 150 Students (75 Female, 75 Male) ---
+    female_first_names = [
+        'Aishwarya', 'Akshaya', 'Anusha', 'Aparna', 'Bhavna', 'Charu', 'Deepika', 'Dhanya', 'Divya', 'Gayatri',
+        'Geetha', 'Harini', 'Haritha', 'Ishita', 'Janani', 'Kavya', 'Keerthana', 'Krithika', 'Lavanya', 'Madhuri',
+        'Malini', 'Mythili', 'Nandini', 'Neha', 'Nithya', 'Pallavi', 'Pavithra', 'Pooja', 'Preethi', 'Rachana',
+        'Radhika', 'Rekha', 'Sahana', 'Saranya', 'Shobha', 'Shreya', 'Shruti', 'Sindhu', 'Sowmya', 'Swathi',
+        'Tanvi', 'Tejaswini', 'Trisha', 'Uma', 'Vaishnavi', 'Vani', 'Varsha', 'Vidya', 'Yamini', 'Aditi',
+        'Bhavani', 'Deepti', 'Gauri', 'Hemalatha', 'Jayanthi', 'Kausalya', 'Lakshmi', 'Manju', 'Padma', 'Revathi',
+        'Sudha', 'Usha', 'Vijaya', 'Aarthi', 'Ashwini', 'Kalyani', 'Lata', 'Nirupama', 'Sujatha', 'Tara',
+        'Bina', 'Damini', 'Esha', 'Falguni', 'Gitanjali'
+    ]
+    male_first_names = [
+        'Abhinav', 'Ajay', 'Akash', 'Akhil', 'Amrit', 'Arjun', 'Ashwin', 'Balaji', 'Bharat', 'Bharath',
+        'Bhuvan', 'Chandan', 'Charan', 'Chetan', 'Darshan', 'Deepak', 'Deva', 'Dinesh', 'Ganesh', 'Gautham',
+        'Girish', 'Gokul', 'Guru', 'Hari', 'Harish', 'Harsha', 'Hemanth', 'Jagdish', 'Jayesh', 'Jeevan',
+        'Kaushik', 'Kiran', 'Kishore', 'Lokesh', 'Madhav', 'Manoj', 'Mohan', 'Mukund', 'Naresh', 'Naveen',
+        'Nikhil', 'Nithin', 'Omkar', 'Parth', 'Pradeep', 'Pranav', 'Praveen', 'Raghu', 'Rajesh', 'Ramesh',
+        'Rohit', 'Sachin', 'Sai', 'Sandeep', 'Sanjay', 'Sharath', 'Sriram', 'Surya', 'Tarun', 'Teja',
+        'Uday', 'Varun', 'Venkat', 'Vignesh', 'Vishal', 'Vivek', 'Yash', 'Yogesh', 'Anirudh', 'Bhaskar',
+        'Chinmay', 'Devesh', 'Eeshan', 'Farhan', 'Govind'
+    ]
+    last_names = [
+        'Sharma', 'Patel', 'Iyer', 'Nair', 'Kumar', 'Reddy', 'Verma', 'Joshi', 'Rao', 'Das',
+        'Gupta', 'Sen', 'Pillai', 'Menon', 'Murthy', 'Bhat', 'Kulkarni', 'Hegde', 'Nambiar', 'Deshmukh',
+        'Chopra', 'Bansal', 'Agarwal', 'Mittal', 'Mishra', 'Pandey', 'Tripathi', 'Shukla', 'Chatterjee', 'Banerjee',
+        'Ghosh', 'Bose', 'Roy', 'Dutta', 'Paul', 'Bhattacharya', 'Shenoy', 'Prabhu', 'Kamath', 'Nayak'
+    ]
+
+    batches_config = [
+        (2024, 3),
+        (2025, 2),
+        (2023, 4),
+    ]
+
+    f_idx = 0
+    for b_year, a_yr in batches_config:
+        for seq in range(1, 26):
+            fname = female_first_names[f_idx]
+            lname = last_names[f_idx % len(last_names)]
+            roll = f'CB.SC.U4CSE{str(b_year)[-2:]}2{seq:02d}'
+            email = f'{fname.lower()}.{lname.lower()}{b_year}{seq}@staywise.edu'
+            seed_users.append({
+                'legacy_roll': None,
+                'roll_number': roll,
+                'name': f'{fname} {lname}',
+                'email': email,
+                'password': 'student123',
+                'role': 'student',
+                'gender': 'female',
+                'academic_year': a_yr,
+                'degree_level': 'B.Tech',
+                'program': cse_u4,
+                'batch': b_year,
+                'section_letter': 'C',
+                'sequence': seq
+            })
+            f_idx += 1
+
+    m_idx = 0
+    for b_year, a_yr in batches_config:
+        for seq in range(1, 26):
+            mname = male_first_names[m_idx]
+            lname = last_names[m_idx % len(last_names)]
+            roll = f'CB.SC.U4CSE{str(b_year)[-2:]}3{seq:02d}'
+            email = f'{mname.lower()}.{lname.lower()}{b_year}{seq}@staywise.edu'
+            seed_users.append({
+                'legacy_roll': None,
+                'roll_number': roll,
+                'name': f'{mname} {lname}',
+                'email': email,
+                'password': 'student123',
+                'role': 'student',
+                'gender': 'male',
+                'academic_year': a_yr,
+                'degree_level': 'B.Tech',
+                'program': cse_u4,
+                'batch': b_year,
+                'section_letter': 'D',
+                'sequence': seq
+            })
+            m_idx += 1
+
     for u_data in seed_users:
         leg = u_data['legacy_roll']
         gen_roll = u_data['roll_number']
