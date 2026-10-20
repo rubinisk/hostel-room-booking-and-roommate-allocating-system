@@ -1,17 +1,17 @@
-# 🏨 Smart Priority-Based Hostel Room Allocation & Roommate Matching System
+#  Smart Priority-Based Hostel Room Allocation & Roommate Matching System
 
 A production-ready, algorithm-driven hostel room allocation and roommate grouping platform engineered with advanced Data Structures and Algorithms (DSA) to ensure transparency, fairness, and automated conflict-free placement.
 
 ---
 
-### 🌐 Live Interactive Demo
-🚀 **Access the Live Web Application:** **[StayWise — Smart Hostel Room Booking & Allocation System](https://smart-priority-based-hostel-room-al.vercel.app/)**
+###  Live Interactive Demo
+**Access the Live Web Application:** **[StayWise — Smart Hostel Room Booking & Allocation System](https://smart-priority-based-hostel-room-al.vercel.app/)**
 
 > *Note: The full-stack interactive client is deployed on Vercel and connected to our cloud backend to visualize the 4 core DSA allocation algorithms in real time.*
 
 ---
 
-## 🎯 System Architecture & DSA Modules
+##  System Architecture & DSA Modules
 
 The backend architecture is modularly divided across 4 core Data Structures and Algorithm paradigms:
 
@@ -52,7 +52,7 @@ The backend architecture is modularly divided across 4 core Data Structures and 
 
 ---
 
-## 👥 Team Contributions
+## Team Contributions
 
 | Member | Module & DSA Topic | Core Files Contributed |
 | :--- | :--- | :--- |
@@ -63,7 +63,7 @@ The backend architecture is modularly divided across 4 core Data Structures and 
 
 ---
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 * Python 3.10+
@@ -93,7 +93,7 @@ python app.py
 
 ---
 
-## 🧪 Running Unit Tests
+## Running Unit Tests
 
 Run all automated test suites using `pytest`:
 
