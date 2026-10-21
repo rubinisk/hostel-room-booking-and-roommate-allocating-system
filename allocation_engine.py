@@ -24,6 +24,8 @@ class CandidateGroup:
     Candidate element inserted into Min-Heap.
     Implements comparison operator to guarantee deterministic heap ordering.
     """
+    # Time complexity - O(1)
+    # Justification - Initializing scalar and list reference fields takes constant time.
     def __init__(self, mismatch_rank, submitted_at, reg_num, app_ids, member_ids, requested_sharing, group_size, leader_app):
         self.mismatch_rank = mismatch_rank  # 0 for exact match, 1 for compatible
         self.submitted_at = submitted_at      # datetime or ISO string
@@ -34,6 +36,8 @@ class CandidateGroup:
         self.group_size = group_size
         self.leader_app = leader_app
 
+    # Time complexity - O(1)
+    # Justification - Constant-time scalar comparisons across integer mismatch rank, timestamp, and string registration number tie-breakers.
     def __lt__(self, other):
         # 1. Exact capacity match (0) outranks compatible match (1)
         if self.mismatch_rank != other.mismatch_rank:
@@ -45,6 +49,8 @@ class CandidateGroup:
         return self.reg_num < other.reg_num
 
 
+# Time complexity - O(A log A + A * R_hostel) where A is the number of candidate applications/groups and R_hostel is the rooms per hostel
+# Justification - Building and draining the candidate min-heap takes O(A log A) time, and for each candidate, scanning candidate rooms across preferences takes O(R_hostel) time.
 def run_allocation(admin_id=None, cycle_year=2026, commit=False):
     """
     Executes the StayWise Priority-Based Greedy Heap Allocation Algorithm.

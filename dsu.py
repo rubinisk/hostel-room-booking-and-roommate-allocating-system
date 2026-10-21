@@ -1,17 +1,23 @@
 # Disjoint Set Union (DSU) for roommate grouping
 
 class DisjointSetUnion:
+    # Time complexity - O(1)
+    # Justification - Initializing empty dictionaries for parent, rank, and size takes constant time.
     def __init__(self):
         self.parent={}
         self.rank={}
         self.size={}
 
+    # Time complexity - O(1)
+    # Justification - Dictionary key lookup and single-element assignment takes constant time.
     def make_set(self,x):
         if x not in self.parent:
             self.parent[x]=x
             self.rank[x]=0
             self.size[x]=1
 
+    # Time complexity - O(alpha(N)) amortized
+    # Justification - Path compression flattens the tree so all visited nodes point directly to the root, bounded by the inverse Ackermann function.
     def find(self,x):
         if x not in self.parent:
             self.make_set(x)
@@ -22,6 +28,8 @@ class DisjointSetUnion:
             self.parent[x]=self.find(self.parent[x])
         return self.parent[x]
 
+    # Time complexity - O(alpha(N)) amortized
+    # Justification - Calls find twice to locate roots in O(alpha(N)) time and merges trees by rank in O(1) constant time.
     def union(self,x,y):
         root_x=self.find(x)
         root_y=self.find(y)
@@ -44,13 +52,19 @@ class DisjointSetUnion:
 
         return True
 
+    # Time complexity - O(alpha(N))
+    # Justification - Evaluates find(x) and find(y) and checks root equality in O(alpha(N)) time.
     def connected(self,x,y):
         return self.find(x) == self.find(y)
 
+    # Time complexity - O(alpha(N))
+    # Justification - Finds the root representative in O(alpha(N)) time and retrieves the component size from the size map in O(1) time.
     def get_set_size(self,x):
         root=self.find(x)
         return self.size.get(root, 1)
 
+    # Time complexity - O(K * alpha(N)) where K <= 4
+    # Justification - Iterates through candidate group members (maximum 4) and performs root lookups and set checks in linear time relative to group size.
     def can_form_group(self,member_ids,max_group_size=4):
         # max group size check
         if len(member_ids) > max_group_size:
@@ -68,6 +82,8 @@ class DisjointSetUnion:
 
         return True, "Valid group structure."
 
+    # Time complexity - O(M * alpha(M)) where M is the total number of active group members
+    # Justification - Iterates through each active group and merges leader with members using union operations in near-linear time.
     def rebuild_from_db(self,active_groups):
         # reset and rebuild from db when someone leaves
         self.parent.clear()

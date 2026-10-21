@@ -9,6 +9,8 @@ from scheduler import is_application_period_open
 
 student_bp = Blueprint('student', __name__, url_prefix='/api/student')
 
+# Time complexity - O(G * K * alpha(M)) where G is active groups and K <= 4 is group size
+# Justification - Fetches active confirmed groups from database and calls rebuild_from_db to reconstruct disjoint sets with inverse Ackermann complexity.
 def get_active_dsu():
     """Initializes and builds DSU from current active confirmed groups in the database."""
     dsu = DisjointSetUnion()
@@ -21,10 +23,14 @@ def get_active_dsu():
     dsu.rebuild_from_db(active_records)
     return dsu
 
+# Time complexity - O(1)
+# Justification - Generating 5 random digits and formatting a string executes in constant time.
 def generate_registration_number(year=2026):
     rand_suffix = ''.join(random.choices(string.digits, k=5))
     return f"SW-{year}-{rand_suffix}"
 
+# Time complexity - O(1)
+# Justification - Indexed database query by uppercase roll number or legacy roll number runs in constant time.
 def find_student_by_roll(roll_str):
     if not roll_str:
         return None
@@ -36,6 +42,8 @@ def find_student_by_roll(roll_str):
 
 @student_bp.route('/hostels', methods=['GET'])
 @jwt_required()
+# Time complexity - O(H * C) where H is the count of active hostels and C is sharing configs per hostel
+# Justification - Iterates through active hostels matching student gender and filters sharing configurations based on academic year and PG status.
 def get_eligible_hostels():
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -68,6 +76,8 @@ def get_eligible_hostels():
 
 @student_bp.route('/rooms/<int:hostel_id>', methods=['GET'])
 @jwt_required()
+# Time complexity - O(R) where R is the number of rooms in the requested hostel
+# Justification - Queries and sorts filtered rooms by floor and room number in linear time relative to room count.
 def get_hostel_rooms(hostel_id):
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -96,6 +106,8 @@ def get_hostel_rooms(hostel_id):
 
 @student_bp.route('/group/my-group', methods=['GET'])
 @jwt_required()
+# Time complexity - O(K) where K is the number of members in the student's group (K <= 4)
+# Justification - Queries the user's active group and fetches group member user profiles in linear time relative to group size.
 def get_my_group():
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -176,6 +188,8 @@ def get_my_group():
 
 @student_bp.route('/group/invite', methods=['POST'])
 @jwt_required()
+# Time complexity - O(K * alpha(N)) where K <= 4 is group size and N is student count
+# Justification - Rebuilds active DSU, checks group constraints and acyclicity with can_form_group, and creates pending membership records.
 def invite_roommate():
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -297,6 +311,8 @@ def invite_roommate():
 
 @student_bp.route('/group/remove-member', methods=['POST'])
 @jwt_required()
+# Time complexity - O(K) where K <= 4 is the number of remaining group members
+# Justification - Deletes member record, updates group status and size, and commits to database in bounded constant time.
 def remove_group_member():
     user_id = int(get_jwt_identity())
     group = Group.query.filter_by(leader_student_id=user_id).filter(Group.status.in_(['pending', 'confirmed'])).first()
@@ -340,6 +356,8 @@ def remove_group_member():
 
 @student_bp.route('/group/reset', methods=['POST'])
 @jwt_required()
+# Time complexity - O(K) where K <= 4 is the number of group members
+# Justification - Deletes all associated group member records and the parent group in bounded constant time.
 def reset_group():
     user_id = int(get_jwt_identity())
     group = Group.query.filter_by(leader_student_id=user_id).filter(Group.status.in_(['pending', 'confirmed'])).first()
@@ -351,6 +369,8 @@ def reset_group():
 
 @student_bp.route('/application', methods=['GET'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Single indexed database query for student application and related group status in constant time.
 def get_my_application():
     user_id = int(get_jwt_identity())
     app_rec = Application.query.filter_by(student_id=user_id).first()
@@ -383,6 +403,8 @@ def get_my_application():
 
 @student_bp.route('/application', methods=['POST'])
 @jwt_required()
+# Time complexity - O(K * alpha(N) + P) where K <= 4 is group size and P is the number of preferred rooms
+# Justification - Validates deadline, verifies group membership via DSU, saves 3 ranked preferences, and links preferred rooms.
 def submit_application():
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -678,6 +700,8 @@ def submit_application():
 
 @student_bp.route('/application', methods=['PUT'])
 @jwt_required()
+# Time complexity - O(P) where P is the number of preferred rooms
+# Justification - Verifies submission status and deadline, replaces preferred room selections, and updates preference columns.
 def modify_application():
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -847,6 +871,8 @@ def modify_application():
 @student_bp.route('/application/cancel', methods=['POST'])
 @student_bp.route('/application', methods=['DELETE'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Checks deadline, deletes preferred room links, and marks application cancelled in constant time.
 def cancel_application():
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -917,6 +943,8 @@ def cancel_application():
 
 @student_bp.route('/invitations', methods=['GET'])
 @jwt_required()
+# Time complexity - O(I) where I is the number of pending invitations for the student
+# Justification - Queries pending group memberships and retrieves leader information for each invitation.
 def get_invitations():
     user_id = int(get_jwt_identity())
     pending_m = GroupMember.query.filter_by(student_id=user_id, status='pending').all()
@@ -939,6 +967,8 @@ def get_invitations():
 
 @student_bp.route('/invitations/<int:invitation_id>/respond', methods=['POST'])
 @jwt_required()
+# Time complexity - O(K * alpha(N)) where K <= 4 is group size
+# Justification - Updates invitation status, runs DSU cycle check and capacity validation, and confirms group if all accepted.
 def respond_invitation(invitation_id):
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
@@ -1000,6 +1030,8 @@ def respond_invitation(invitation_id):
 
 @student_bp.route('/allocation', methods=['GET'])
 @jwt_required()
+# Time complexity - O(B) where B is the number of beds in the allocated room (B <= 4)
+# Justification - Fetches allocation and waitlist records, and retrieves co-roommates occupying the same room.
 def get_my_allocation():
     user_id = int(get_jwt_identity())
     alloc = Allocation.query.filter_by(student_id=user_id).first()
@@ -1032,6 +1064,8 @@ def get_my_allocation():
 
 @student_bp.route('/notifications', methods=['GET'])
 @jwt_required()
+# Time complexity - O(N_notif) where N_notif is the number of user notifications
+# Justification - Queries and sorts user notifications ordered by creation timestamp in linear time.
 def get_notifications():
     user_id = int(get_jwt_identity())
     notifs = Notification.query.filter_by(user_id=user_id).order_by(Notification.created_at.desc()).all()
@@ -1039,6 +1073,8 @@ def get_notifications():
 
 @student_bp.route('/notifications/read', methods=['POST'])
 @jwt_required()
+# Time complexity - O(N_unread) where N_unread is the number of unread notifications
+# Justification - Bulk updates is_read flag for all unread notifications of the logged-in student.
 def mark_notifications_read():
     user_id = int(get_jwt_identity())
     Notification.query.filter_by(user_id=user_id, is_read=False).update({'is_read': True})

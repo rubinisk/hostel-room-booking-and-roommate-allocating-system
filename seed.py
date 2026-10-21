@@ -9,6 +9,8 @@ from roll_number_service import (
     DEFAULT_SECTION_CAPACITY, DEFAULT_CAMPUS_CODE, DEFAULT_SCHOOL_CODE
 )
 
+# Time complexity - O(C_table) where C_table is the number of database schema columns checked
+# Justification - Executes PRAGMA table inspection queries and applies missing schema ALTER statements in linear time relative to columns.
 def check_and_apply_migrations():
     """Ensure database tables have new columns without breaking SQLite integrity."""
     try:
@@ -201,6 +203,8 @@ HOSTELS_SPEC = [
     },
 ]
 
+# Time complexity - O(P + H * R + N_seed) where P is programs, H is hostels, R is rooms, and N_seed is initial demo students
+# Justification - Idempotently creates tables, inserts programs, hostel room inventory, demo student accounts, and sample applications.
 def seed_database():
     db.create_all()
     check_and_apply_migrations()

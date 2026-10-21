@@ -25,6 +25,8 @@ from roll_number_service import (
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
 
+# Time complexity - O(1)
+# Justification - Checks role claim in decoded JWT token in constant time.
 def admin_required():
     claims = get_jwt()
     if claims.get('role') != 'admin':
@@ -33,6 +35,8 @@ def admin_required():
 
 @admin_bp.route('/overview', methods=['GET'])
 @jwt_required()
+# Time complexity - O(R + S) where R is total rooms and S is total students
+# Justification - Aggregates database counts and bed occupancies across rooms in linear time.
 def get_overview_metrics():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -71,6 +75,8 @@ def get_overview_metrics():
 
 @admin_bp.route('/settings', methods=['POST'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Updates application cycle flags and closing timestamp in constant time.
 def update_settings():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -90,6 +96,8 @@ def update_settings():
 
 @admin_bp.route('/students', methods=['GET'])
 @jwt_required()
+# Time complexity - O(N log N) where N is the total registered student count
+# Justification - Queries and sorts all student records alphabetically by roll number.
 def get_students():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -99,6 +107,8 @@ def get_students():
 
 @admin_bp.route('/students/<int:student_id>/toggle-status', methods=['POST'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Toggles boolean status flag on User record and appends an audit log in constant time.
 def toggle_student_status(student_id):
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -122,6 +132,8 @@ def toggle_student_status(student_id):
 
 @admin_bp.route('/hostels', methods=['GET'])
 @jwt_required()
+# Time complexity - O(H) where H is the total number of hostels
+# Justification - Queries all hostel blocks and serializes their attributes in linear time.
 def get_all_hostels():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -131,6 +143,8 @@ def get_all_hostels():
 
 @admin_bp.route('/rooms', methods=['GET'])
 @jwt_required()
+# Time complexity - O(R log R) where R is the number of queried rooms
+# Justification - Filters and orders rooms by hostel, floor, and room number.
 def get_all_rooms():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -152,6 +166,8 @@ def get_all_rooms():
 
 @admin_bp.route('/applications', methods=['GET'])
 @jwt_required()
+# Time complexity - O(A log A) where A is the total number of submitted applications
+# Justification - Filters applications by student or status and sorts by submission timestamp.
 def get_applications():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -175,6 +191,8 @@ def get_applications():
 
 @admin_bp.route('/allocation/preview', methods=['POST'])
 @jwt_required()
+# Time complexity - O(A log A + A * R_hostel) where A is applications and R_hostel is rooms per hostel
+# Justification - Simulates the greedy priority heap allocation run without committing database changes.
 def preview_allocation():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -184,6 +202,8 @@ def preview_allocation():
 
 @admin_bp.route('/allocation/confirm', methods=['POST'])
 @jwt_required()
+# Time complexity - O(A log A + A * R_hostel) where A is applications and R_hostel is rooms per hostel
+# Justification - Triggers deadline allocation engine and commits all room allocations, beds, and payment invoices.
 def confirm_allocation():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -194,6 +214,8 @@ def confirm_allocation():
 
 @admin_bp.route('/waitlist', methods=['GET'])
 @jwt_required()
+# Time complexity - O(W log W) where W is the number of waitlisted candidates
+# Justification - Queries all waitlist records ordered chronologically by creation timestamp.
 def get_waitlist():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -203,6 +225,8 @@ def get_waitlist():
 
 @admin_bp.route('/audit-logs', methods=['GET'])
 @jwt_required()
+# Time complexity - O(L log L) where L is the number of audit log entries
+# Justification - Queries and sorts administrative audit logs in descending timestamp order.
 def get_audit_logs():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -216,6 +240,8 @@ def get_audit_logs():
 
 @admin_bp.route('/programs', methods=['GET'])
 @jwt_required()
+# Time complexity - O(P * S) where P is programs and S is sections per program
+# Justification - Fetches all academic programs with nested sections and enrolled student counts.
 def get_programs():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -237,6 +263,8 @@ def get_programs():
 
 @admin_bp.route('/programs', methods=['POST'])
 @jwt_required()
+# Time complexity - O(S_init) where S_init is the number of initial sections (<= 8)
+# Justification - Validates department code, inserts Program record, and initializes sections with sequence counters.
 def create_program():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -332,6 +360,8 @@ def create_program():
 
 @admin_bp.route('/programs/<int:program_id>', methods=['PUT'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Modifies program metadata, increments configuration version, and writes audit record in constant time.
 def update_program(program_id):
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -369,6 +399,8 @@ def update_program(program_id):
 
 @admin_bp.route('/programs/<int:program_id>/toggle-status', methods=['POST'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Inverts active status boolean flag on Program record in constant time.
 def toggle_program_status(program_id):
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -394,6 +426,8 @@ def toggle_program_status(program_id):
 
 @admin_bp.route('/sections', methods=['GET'])
 @jwt_required()
+# Time complexity - O(S) where S is the number of matching sections
+# Justification - Queries sections filtered by program and batch year, sorted by section letter.
 def get_sections():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -412,6 +446,8 @@ def get_sections():
 
 @admin_bp.route('/sections', methods=['POST'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Validates section letter capacity constraints, inserts Section record, and initializes sequence tracker.
 def create_section():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -479,6 +515,8 @@ def create_section():
 
 @admin_bp.route('/sections/<int:section_id>', methods=['PUT'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Validates capacity bounds and updates section settings in constant time.
 def update_section(section_id):
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -502,6 +540,8 @@ def update_section(section_id):
 
 @admin_bp.route('/roll-numbers/search', methods=['GET'])
 @jwt_required()
+# Time complexity - O(K) where K is the match limit (K <= 50)
+# Justification - Executes substring pattern search on roll number, legacy roll number, and student name with limit 50.
 def search_roll_numbers():
     auth_err = admin_required()
     if auth_err: return auth_err
@@ -522,6 +562,8 @@ def search_roll_numbers():
 
 @admin_bp.route('/students/import-csv', methods=['POST'])
 @jwt_required()
+# Time complexity - O(R_csv) where R_csv is the number of rows in the uploaded CSV
+# Justification - Parses each CSV row, validates or atomically generates roll numbers, and bulk commits student users.
 def import_students_csv():
     """
     Imports authorized student rosters from CSV.
@@ -650,6 +692,8 @@ def import_students_csv():
 
 @admin_bp.route('/students/export-csv', methods=['GET'])
 @jwt_required()
+# Time complexity - O(N log N) where N is the total registered student count
+# Justification - Queries and formats all student records into a downloadable streaming CSV roster.
 def export_students_csv():
     auth_err = admin_required()
     if auth_err: return auth_err

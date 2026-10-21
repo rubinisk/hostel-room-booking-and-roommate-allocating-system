@@ -12,6 +12,8 @@ from roll_number_service import (
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @auth_bp.route('/academic-options', methods=['GET'])
+# Time complexity - O(P * S) where P is the count of programs and S is sections per program
+# Justification - Queries all active programs and their configured sections with student seat capacity.
 def get_academic_options():
     """
     Returns active programs and their configured sections with seat statistics
@@ -37,6 +39,8 @@ def get_academic_options():
     }), 200
 
 @auth_bp.route('/register', methods=['POST'])
+# Time complexity - O(1)
+# Justification - Generates an atomic sequence roll number and inserts the new student record in constant time.
 def register():
     """
     Student registration: validates academic choice, atomically generates a StayWise roll number,
@@ -133,6 +137,8 @@ def register():
         return jsonify({'error': f'Registration failed: {str(e)}'}), 500
 
 @auth_bp.route('/login', methods=['POST'])
+# Time complexity - O(1)
+# Justification - Performs indexed roll number lookup, PBKDF2 hash verification, and JWT creation in constant time.
 def login():
     data = request.get_json() or {}
     roll_number = data.get('roll_number', '').strip().upper()
@@ -172,6 +178,8 @@ def login():
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Primary key lookup on User table by JWT identity executes in constant time.
 def me():
     current_user_id = get_jwt_identity()
     user = User.query.get(int(current_user_id))
@@ -181,6 +189,8 @@ def me():
 
 @auth_bp.route('/student-lookup/<roll_number>', methods=['GET'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Performs indexed dual lookup on uppercase roll number and gender validation in constant time.
 def student_lookup(roll_number):
     current_user_id = get_jwt_identity()
     target_roll = roll_number.strip().upper()

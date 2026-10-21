@@ -9,6 +9,8 @@ payment_bp = Blueprint('payment', __name__, url_prefix='/api/payment')
 
 @payment_bp.route('/details', methods=['GET'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Indexed lookups on Allocation and Payment tables by student ID execute in constant time.
 def get_payment_details():
     user_id = int(get_jwt_identity())
     
@@ -28,6 +30,8 @@ def get_payment_details():
 
 @payment_bp.route('/pay', methods=['POST'])
 @jwt_required()
+# Time complexity - O(1)
+# Justification - Generates receipt tokens and updates payment, allocation, and application records in constant time.
 def execute_simulated_payment():
     user_id = int(get_jwt_identity())
     user = User.query.get(user_id)

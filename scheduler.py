@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 from models import db, ApplicationSettings, AllocationRun
 from allocation_engine import run_allocation
 
+# Time complexity - O(1)
+# Justification - Single indexed database query on cycle_year and constant-time default record initialization.
 def get_or_create_settings(cycle_year=2026):
     """Fetches or initializes the application cycle window settings."""
     settings = ApplicationSettings.query.filter_by(cycle_year=cycle_year).first()
@@ -23,6 +25,8 @@ def get_or_create_settings(cycle_year=2026):
         db.session.commit()
     return settings
 
+# Time complexity - O(1)
+# Justification - Retrieves settings and performs constant-time timestamp range comparisons.
 def is_application_period_open(cycle_year=2026):
     """Returns True if current time is within the active application period."""
     settings = get_or_create_settings(cycle_year)
@@ -35,6 +39,8 @@ def is_application_period_open(cycle_year=2026):
         return False
     return True
 
+# Time complexity - O(A log A + A * R_hostel) where A is candidate applications and R_hostel is rooms per hostel
+# Justification - Validates deadline timestamps in O(1) time and delegates to the priority-based greedy allocation engine.
 def trigger_deadline_allocation(cycle_year=2026, admin_id=None, force=False):
     """
     Checks if application deadline has passed, and executes final allocation idempotently.

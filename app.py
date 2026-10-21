@@ -33,14 +33,20 @@ jwt = JWTManager(app)
 
 # JWT Error handling
 @jwt.unauthorized_loader
+# Time complexity - O(1)
+# Justification - Returns JSON 401 error response in constant time.
 def unauthorized_callback(callback):
     return jsonify({'error': 'Missing Authorization Header or Token'}), 401
 
 @jwt.invalid_token_loader
+# Time complexity - O(1)
+# Justification - Returns JSON 401 error response in constant time.
 def invalid_token_callback(callback):
     return jsonify({'error': 'Invalid Authorization Token'}), 401
 
 @jwt.expired_token_loader
+# Time complexity - O(1)
+# Justification - Returns JSON 401 error response in constant time.
 def expired_token_callback(jwt_header, jwt_payload):
     return jsonify({'error': 'Session Token Has Expired. Please Log In Again.'}), 401
 
@@ -51,12 +57,16 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(payment_bp)
 
 @app.route('/api/health', methods=['GET'])
+# Time complexity - O(1)
+# Justification - Returns static server status and health check dictionary in constant time.
 def health_check():
     return jsonify({'status': 'healthy', 'system': 'StayWise Smart Hostel Booking System API', 'version': '1.0.0'}), 200
 
 # Serve React Frontend SPA routes
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
+# Time complexity - O(1)
+# Justification - Resolves static file path and streams HTML index or static asset in constant time.
 def serve_frontend(path):
     if path.startswith('api/'):
         return jsonify({'error': 'Endpoint not found'}), 404

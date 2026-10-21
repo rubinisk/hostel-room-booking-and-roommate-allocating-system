@@ -38,6 +38,8 @@ class RollNumberValidationError(Exception):
 class SectionCapacityExceededError(Exception):
     pass
 
+# Time complexity - O(1)
+# Justification - Stripping and matching a 3-character uppercase string against a precompiled regular expression executes in constant time.
 def validate_department_code(code: str) -> str:
     """
     Validates that the department code consists of exactly 3 uppercase letters.
@@ -49,6 +51,8 @@ def validate_department_code(code: str) -> str:
         raise RollNumberValidationError(f"Department code '{clean}' is invalid. It must contain exactly three uppercase alphabetic characters (e.g. 'CSE').")
     return clean
 
+# Time complexity - O(1)
+# Justification - Matching a fixed-length formatted roll number string against a compiled regular expression takes constant time.
 def validate_roll_number_format(roll_number: str) -> bool:
     """
     Validates whether the roll number matches the StayWise configurable format.
@@ -59,6 +63,8 @@ def validate_roll_number_format(roll_number: str) -> bool:
     clean = roll_number.strip().upper()
     return bool(ROLL_NUMBER_REGEX.match(clean))
 
+# Time complexity - O(1)
+# Justification - Regex capture extraction and fixed dictionary lookups on a bounded-length roll number string take constant time.
 def parse_roll_number(roll_number: str) -> dict:
     """
     Parses a StayWise roll number into its component parts.
@@ -95,6 +101,8 @@ def parse_roll_number(roll_number: str) -> dict:
         'full_roll_number': clean
     }
 
+# Time complexity - O(1)
+# Justification - Primary key lookups, atomic row lock updates, and formatted string concatenation take constant time.
 def generate_roll_number_atomic(program_id: int, admission_batch_year: int, section_id: int, session=None) -> tuple[str, int]:
     """
     Atomically allocates a new sequence number and generates a StayWise roll number.
