@@ -12,8 +12,6 @@ from roll_number_service import (
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @auth_bp.route('/academic-options', methods=['GET'])
-# Time complexity - O(P * S) where P is the count of programs and S is sections per program
-# Justification - Queries all active programs and their configured sections with student seat capacity.
 def get_academic_options():
     """
     Returns active programs and their configured sections with seat statistics
@@ -137,8 +135,7 @@ def register():
         return jsonify({'error': f'Registration failed: {str(e)}'}), 500
 
 @auth_bp.route('/login', methods=['POST'])
-# Time complexity - O(1)
-# Justification - Performs indexed roll number lookup, PBKDF2 hash verification, and JWT creation in constant time.
+
 def login():
     data = request.get_json() or {}
     roll_number = data.get('roll_number', '').strip().upper()
@@ -147,7 +144,6 @@ def login():
     if not roll_number or not password:
         return jsonify({'error': 'Roll number (or Admin ID) and password are required.'}), 400
 
-    # Dual lookup: support both new generated roll number and legacy demo roll number (e.g. STU1001)
     user = User.query.filter(
         (func.upper(User.roll_number) == roll_number) |
         (func.upper(User.legacy_roll_number) == roll_number)
@@ -179,7 +175,7 @@ def login():
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 # Time complexity - O(1)
-# Justification - Primary key lookup on User table by JWT identity executes in constant time.
+
 def me():
     current_user_id = get_jwt_identity()
     user = User.query.get(int(current_user_id))
@@ -190,7 +186,6 @@ def me():
 @auth_bp.route('/student-lookup/<roll_number>', methods=['GET'])
 @jwt_required()
 # Time complexity - O(1)
-# Justification - Performs indexed dual lookup on uppercase roll number and gender validation in constant time.
 def student_lookup(roll_number):
     current_user_id = get_jwt_identity()
     target_roll = roll_number.strip().upper()
@@ -199,7 +194,6 @@ def student_lookup(roll_number):
     if current_user and (current_user.roll_number.upper() == target_roll or (current_user.legacy_roll_number and current_user.legacy_roll_number.upper() == target_roll)):
         return jsonify({'error': 'You cannot invite yourself as a roommate.'}), 400
 
-    # Dual lookup: search by generated roll_number or legacy_roll_number
     target_user = User.query.filter(
         (func.upper(User.roll_number) == target_roll) |
         (func.upper(User.legacy_roll_number) == target_roll)
